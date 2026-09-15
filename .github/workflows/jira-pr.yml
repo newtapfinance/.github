@@ -1,10 +1,10 @@
 name: Jira PR Automation
 
 on:
-  workflow_call:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
-  contents: read
   pull-requests: write
 
 jobs:
@@ -19,14 +19,13 @@ jobs:
         run: |
           echo "Branch: $BRANCH_NAME"
 
-          if [[ "$BRANCH_NAME" =~ ^(NTD-[0-9]+)/ ]]; then
+          if [[ "$BRANCH_NAME" =~ ^(NTD-[0-9]+)(/|$) ]]; then
             JIRA_KEY="${BASH_REMATCH[1]}"
             echo "jira_key=$JIRA_KEY" >> "$GITHUB_OUTPUT"
             echo "Found Jira ticket: $JIRA_KEY"
           else
-            echo "❌ Branch does not follow NTD-XXX/description"
+            echo "Branch does not start with NTD-<number>. Skipping."
             echo "No Jira key found. Skipping."
-            exit 0
           fi
 
       - name: Update PR
@@ -36,6 +35,11 @@ jobs:
         with:
           script: |
             const jiraKey = process.env.JIRA_KEY;
+            if (!jiraKey) {
+              console.log('No Jira key found; leaving the PR unchanged.');
+              return;
+            }
+
             const jiraUrl =
               `https://newtapfin.atlassian.net/browse/${jiraKey}`;
 
@@ -44,23 +48,11 @@ jobs:
             let title = pr.title;
             let body = pr.body || '';
 
-            // -----------------------------
-            // Update PR title
-            // -----------------------------
-
-            if (!title.startsWith(`${jiraKey}:`)) {
-              title = `${jiraKey}: ${title}`;
-            }
-
-            // -----------------------------
-            // Add Jira link
-            // -----------------------------
-
             const jiraSection =
               `## Jira\n\n` +
               `[${jiraKey}](${jiraUrl})`;
 
-            if (!body.includes(jiraUrl)) {
+            if (!body.includes(`## Jira`)) {
               body = `${jiraSection}\n\n---\n\n${body}`;
             }
 
@@ -72,7 +64,6 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: pr.number,
-              title: title,
               body: body
             });
 
