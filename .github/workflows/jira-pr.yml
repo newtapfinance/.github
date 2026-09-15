@@ -52,10 +52,12 @@ jobs:
               `## 🔗 Jira\n\n` +
               `> **Ticket:** [${jiraKey}](${jiraUrl})\n\n---`;
 
-            const descriptionIndex = body.search(/^## (?:📝 )?Summary\s*$/m);
-            if (descriptionIndex >= 0) {
+            const summaryMatch = body.match(/^## (?:📝 )?(Summary|Description)\s*$/m);
+            if (summaryMatch) {
               // Rebuild the template header so repeated Jira sections cannot accumulate.
-              body = `${jiraSection}\n\n${body.slice(descriptionIndex)}`;
+              const summary = body.slice(summaryMatch.index)
+                .replace(/^## (?:📝 )?(?:Summary|Description)\s*$/m, '## 📝 Summary');
+              body = `${jiraSection}\n\n${summary}`;
             } else if (/^## Jira\s*$/m.test(body)) {
               body = body.replace(
                 /^## Jira\s*$[\s\S]*?(?=^---\s*$)/m,
