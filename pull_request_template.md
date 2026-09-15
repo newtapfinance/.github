@@ -1,100 +1,54 @@
-## Jira
+## 🔗 Jira
 
-<!-- Automatically populated from the branch name. -->
-<!-- Expected branch format: NTD-XXX/description -->
+> <!-- Automatically populated from a branch such as `NTD-716/create-loan`. -->
+> **Ticket:** _Link will be added automatically from the branch name._
 
----
+## 📝 Summary
 
-## Description
+<!-- Briefly explain what changed and why. -->
 
-<!-- What does this PR do? Why is this change required? -->
-
-### What did you change?
+### What changed?
 
 -
 
----
+### Why is this needed?
 
-## Change Type
+-
 
-- [ ] Bug Fix
-- [ ] New Feature
+## 🧪 Validation
+
+<!-- Describe how you tested this change. -->
+
+- **Automated tests:**
+- **Manual testing:**
+- **Test details:**
+
+## 📦 Impact
+
+| Area | Status | Notes |
+| --- | --- | --- |
+| Database | ☐ None |  |
+| API | ☐ None |  |
+| Breaking change | ☐ No |  |
+| Deployment steps | ☐ None |  |
+
+## 🏷️ Change Type
+
+- [ ] Bug fix
+- [ ] New feature
 - [ ] Enhancement
 - [ ] Refactoring
-- [ ] Performance Improvement
-- [ ] Configuration Change
-- [ ] Database Change
+- [ ] Performance improvement
+- [ ] Configuration change
+- [ ] Database change
 - [ ] Documentation
 - [ ] Other
 
----
+## ✅ Ready For Review
 
-## Testing
-
-### Automated
-
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Existing tests passed
-- [ ] No automated testing required
-
-### Manual
-
-- [ ] Manually tested
-- [ ] QA tested
-- [ ] Not applicable
-
-### Test Details
-
-<!-- Explain what you tested -->
-
--
-
----
-
-## Database Changes
-
-- [ ] No database changes
-- [ ] Migration added
-- [ ] Existing migration modified
-
----
-
-## API Changes
-
-- [ ] No API changes
-- [ ] API added
-- [ ] API modified
-- [ ] API removed
-
----
-
-## Breaking Changes
-
-- [ ] No breaking changes
-- [ ] Breaking change
-
----
-
-## Deployment Notes
-
-- [ ] No special deployment steps
-- [ ] Configuration change required
-- [ ] Database migration required
-- [ ] Feature flag required
-- [ ] Other
-
-Details:
-
----
-
-## Checklist
-
-- [ ] Jira ticket linked
-- [ ] Branch follows `NTD-XXX/description` convention
-- [ ] Code formatted
-- [ ] Tests passing
-- [ ] No debug code
-- [ ] Logs are appropriate
-- [ ] Documentation updated if required
+- [ ] Branch follows `NTD-XXX/description`
+- [ ] Code is formatted
+- [ ] Tests are passing or not applicable
+- [ ] No debug code or inappropriate logs remain
+- [ ] Documentation is updated if needed
 - [ ] PR is ready for review

@@ -49,10 +49,10 @@ jobs:
             body = body.replace(/\\n/g, '\n');
 
             const jiraSection =
-              `## Jira\n\n` +
-              `[${jiraKey}](${jiraUrl})\n\n---`;
+              `## 🔗 Jira\n\n` +
+              `> **Ticket:** [${jiraKey}](${jiraUrl})\n\n---`;
 
-            const descriptionIndex = body.search(/^## Description\s*$/m);
+            const descriptionIndex = body.search(/^## (?:📝 )?Summary\s*$/m);
             if (descriptionIndex >= 0) {
               // Rebuild the template header so repeated Jira sections cannot accumulate.
               body = `${jiraSection}\n\n${body.slice(descriptionIndex)}`;
