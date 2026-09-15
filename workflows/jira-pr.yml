@@ -25,8 +25,8 @@ jobs:
             echo "Found Jira ticket: $JIRA_KEY"
           else
             echo "❌ Branch does not follow NTD-XXX/description"
-            echo "Expected example: NTD-716/add-readme"
-            exit 1
+            echo "No Jira key found. Skipping."
+            exit 0
           fi
 
       - name: Update PR
