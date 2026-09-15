@@ -1,0 +1,80 @@
+name: Jira PR Automation
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  jira-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract Jira ticket from branch
+        id: jira
+        env:
+          BRANCH_NAME: ${{ github.head_ref }}
+        run: |
+          echo "Branch: $BRANCH_NAME"
+
+          if [[ "$BRANCH_NAME" =~ ^(NTD-[0-9]+)/ ]]; then
+            JIRA_KEY="${BASH_REMATCH[1]}"
+            echo "jira_key=$JIRA_KEY" >> "$GITHUB_OUTPUT"
+            echo "Found Jira ticket: $JIRA_KEY"
+          else
+            echo "❌ Branch does not follow NTD-XXX/description"
+            echo "No Jira key found. Skipping."
+            exit 0
+          fi
+
+      - name: Update PR
+        uses: actions/github-script@v7
+        env:
+          JIRA_KEY: ${{ steps.jira.outputs.jira_key }}
+        with:
+          script: |
+            const jiraKey = process.env.JIRA_KEY;
+            const jiraUrl =
+              `https://newtapfin.atlassian.net/browse/${jiraKey}`;
+
+            const pr = context.payload.pull_request;
+
+            let title = pr.title;
+            let body = pr.body || '';
+
+            // -----------------------------
+            // Update PR title
+            // -----------------------------
+
+            if (!title.startsWith(`${jiraKey}:`)) {
+              title = `${jiraKey}: ${title}`;
+            }
+
+            // -----------------------------
+            // Add Jira link
+            // -----------------------------
+
+            const jiraSection =
+              `## Jira\n\n` +
+              `[${jiraKey}](${jiraUrl})`;
+
+            if (!body.includes(jiraUrl)) {
+              body = `${jiraSection}\n\n---\n\n${body}`;
+            }
+
+            // -----------------------------
+            // Update PR
+            // -----------------------------
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              title: title,
+              body: body
+            });
+
+            console.log(`Jira ticket: ${jiraKey}`);
+            console.log(`Jira URL: ${jiraUrl}`);
