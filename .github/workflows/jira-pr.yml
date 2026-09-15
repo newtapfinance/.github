@@ -46,20 +46,25 @@ jobs:
 
             const pr = context.payload.pull_request;
 
-            let title = pr.title;
             let body = pr.body || '';
+            // Normalize literal escaped newlines left by older workflow runs.
+            body = body.replace(/\\n/g, '\n');
 
             const jiraSection =
               `## Jira\n\n` +
-              `[${jiraKey}](${jiraUrl})`;
+              `[${jiraKey}](${jiraUrl})\n\n---`;
 
-            if (/^## Jira\s*$/m.test(body)) {
+            const descriptionIndex = body.search(/^## Description\s*$/m);
+            if (descriptionIndex >= 0) {
+              // Rebuild the template header so repeated Jira sections cannot accumulate.
+              body = `${jiraSection}\n\n${body.slice(descriptionIndex)}`;
+            } else if (/^## Jira\s*$/m.test(body)) {
               body = body.replace(
                 /^## Jira\s*$[\s\S]*?(?=^---\s*$)/m,
-                `${jiraSection}\n\n`
+                `${jiraSection}`
               );
             } else {
-              body = `${jiraSection}\n\n---\n\n${body}`;
+              body = `${jiraSection}\n\n${body}`;
             }
 
             // -----------------------------
