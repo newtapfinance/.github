@@ -2,8 +2,6 @@ name: Jira PR Automation
 
 on:
   workflow_call:
-  pull_request_target:
-    types: [opened, synchronize, reopened, edited]
 
 permissions:
   pull-requests: write

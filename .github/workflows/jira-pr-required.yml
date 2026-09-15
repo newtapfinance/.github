@@ -1,0 +1,11 @@
+name: Jira PR Required Workflow
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  jira-pr:
+    uses: newtapfinance/.github/.github/workflows/jira-pr.yml@main
+    permissions:
+      pull-requests: write
