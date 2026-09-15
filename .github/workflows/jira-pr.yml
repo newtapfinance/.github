@@ -53,7 +53,12 @@ jobs:
               `## Jira\n\n` +
               `[${jiraKey}](${jiraUrl})`;
 
-            if (!body.includes(`## Jira`)) {
+            if (/^## Jira\s*$/m.test(body)) {
+              body = body.replace(
+                /^## Jira\s*$[\s\S]*?(?=^---\s*$)/m,
+                `${jiraSection}\n\n`
+              );
+            } else {
               body = `${jiraSection}\n\n---\n\n${body}`;
             }
 
