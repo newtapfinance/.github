@@ -1,6 +1,7 @@
 ## Jira
 
-**Ticket:**
+<!-- Automatically populated from the branch name. -->
+<!-- Expected branch format: NTD-XXX/description -->
 
 ---
 
@@ -47,6 +48,8 @@
 
 <!-- Explain what you tested -->
 
+-
+
 ---
 
 ## Database Changes
@@ -79,7 +82,7 @@
 - [ ] Configuration change required
 - [ ] Database migration required
 - [ ] Feature flag required
-- [ ] Database migration required
+- [ ] Other
 
 Details:
 
