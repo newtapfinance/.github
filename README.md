@@ -67,11 +67,17 @@ PR titles should include the Jira ticket key:
 NTD-533: Create loan changes
 ```
 
-PR descriptions should use the organization-wide PR template provided in:
+PR descriptions use the organization-wide PR template provided in:
 
 ```text
 .github/pull_request_template.md
 ```
+
+The organization-required Jira PR workflow applies this template when a PR is
+created with an empty description. It also adds the linked Jira ticket to the
+description and prefixes the PR title using the key from the source branch.
+Branches must use `<JIRA-TICKET>/<short-description>`, for example
+`NTD-123/feature-name`.
 
 ## Jira Linking
 

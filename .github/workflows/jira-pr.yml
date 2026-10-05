@@ -36,19 +36,99 @@ jobs:
         with:
           script: |
             const jiraKey = process.env.JIRA_KEY;
+            const pr = context.payload.pull_request;
+
+            const defaultTemplate = [
+              '## 🔗 Jira',
+              '',
+              '> <!-- Automatically populated from the branch name. -->',
+              '> **Ticket:** _Link will be added automatically from the branch name._',
+              '',
+              '## 📝 Summary',
+              '',
+              '<!-- Briefly explain what changed and why. -->',
+              '',
+              '### What changed?',
+              '',
+              '-',
+              '',
+              '### Why is this needed?',
+              '',
+              '-',
+              '',
+              '## 🧪 Validation',
+              '',
+              '<!-- Describe how you tested this change. -->',
+              '',
+              '- **Automated tests:**',
+              '- **Manual testing:**',
+              '- **Test details:**',
+              '',
+              '## 📦 Impact',
+              '',
+              '| Area | Status | Notes |',
+              '| --- | --- | --- |',
+              '| Database | ☐ None |  |',
+              '| API | ☐ None |  |',
+              '| Breaking change | ☐ No |  |',
+              '| Deployment steps | ☐ None |  |',
+              '',
+              '## 🏷️ Change Type',
+              '',
+              '- [ ] Bug fix',
+              '- [ ] New feature',
+              '- [ ] Enhancement',
+              '- [ ] Refactoring',
+              '- [ ] Performance improvement',
+              '- [ ] Configuration change',
+              '- [ ] Database change',
+              '- [ ] Documentation',
+              '- [ ] Other',
+              '',
+              '## ✅ Ready For Review',
+              '',
+              '- [ ] Branch follows `NTD-XXX/description`',
+              '- [ ] Code is formatted',
+              '- [ ] Tests are passing or not applicable',
+              '- [ ] No debug code or inappropriate logs remain',
+              '- [ ] Documentation is updated if needed',
+              '- [ ] PR is ready for review'
+            ].join('\n');
+
+            let body = (pr.body || '').trim();
+            const hasTemplateSections =
+              /^## (?:📝 )?Summary\s*$/m.test(body) ||
+              /^## (?:🧪 )?Validation\s*$/m.test(body) ||
+              /^## (?:📦 )?Impact\s*$/m.test(body);
+
+            if (!body) {
+              body = defaultTemplate;
+            } else if (!hasTemplateSections) {
+              // Preserve text entered in GitHub's PR form as the initial summary.
+              body = defaultTemplate.replace(
+                '### What changed?\n\n-',
+                `### What changed?\n\n${body}`
+              );
+            }
+
+            // Normalize literal escaped newlines left by older workflow runs.
+            body = body.replace(/\\n/g, '\n');
+
             if (!jiraKey) {
-              console.log('No Jira key found; leaving the PR unchanged.');
+              if (body !== (pr.body || '')) {
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  body
+                });
+              }
+              console.log('No Jira key found; applied the default template if needed.');
               return;
             }
 
             const jiraUrl =
               `https://newtapfin.atlassian.net/browse/${jiraKey}`;
-
-            const pr = context.payload.pull_request;
-
-            let body = pr.body || '';
-            // Normalize literal escaped newlines left by older workflow runs.
-            body = body.replace(/\\n/g, '\n');
 
             const jiraSection =
               `## 🔗 Jira\n\n` +
@@ -69,6 +149,17 @@ jobs:
               body = `${jiraSection}\n\n${body}`;
             }
 
+            const titleBody = (pr.title || '')
+              .replace(/^(?:NTD-\d+\s*:\s*)+/i, '')
+              .replace(new RegExp(`^${jiraKey}\\b\\s*:?\\s*`, 'i'), '')
+              .trim();
+            const title = titleBody ? `${jiraKey}: ${titleBody}` : jiraKey;
+
+            if (body === (pr.body || '') && title === pr.title) {
+              console.log('PR already has the Jira link and ticket title.');
+              return;
+            }
+
             // -----------------------------
             // Update PR
             // -----------------------------
@@ -77,6 +168,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: pr.number,
+              title: title,
               body: body
             });
 
